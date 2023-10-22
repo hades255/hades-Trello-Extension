@@ -756,14 +756,15 @@ const addHoverIcons = (target) => {
 }
 
 const removeHoverIcons = (target) => {    
-    $('.list-card span.icon-archive').remove()
-    $('.list-card span.icon-check').remove()
-    $('.list-card span.icon-star').remove()
-    $('.list-card span.icon-clock').remove()
-    $('.list-card span.icon-subscribe').remove()
-    $('.list-card span.icon-member').remove()
-    $('.list-card div.outcome-text').remove()    
-    $('.list-card div.charcol-overlay').remove()    
+    console.log("remove")
+    $('[data-testid="list-card"] span.icon-archive').remove()
+    $('[data-testid="list-card"] span.icon-check').remove()
+    $('[data-testid="list-card"] span.icon-star').remove()
+    $('[data-testid="list-card"] span.icon-clock').remove()
+    $('[data-testid="list-card"] span.icon-subscribe').remove()
+    $('[data-testid="list-card"] span.icon-member').remove()
+    $('[data-testid="list-card"] div.outcome-text').remove()    
+    $('[data-testid="list-card"] div.charcol-overlay').remove()    
 }
 
 const updateBoard = () => {
@@ -806,11 +807,11 @@ jQuery("title").bind("DOMSubtreeModified", function () {
 //     }
 // });
 
-jQuery(document).on("mouseenter", ".list-card", function(e) {
+jQuery(document).on("mouseenter", "[data-testid='list-card']", function(e) {
     addHoverIcons($(this))
 })
 
-jQuery(document).on("mouseleave", ".list-card", function(e) {
+jQuery(document).on("mouseleave", "[data-testid='list-card']", function(e) {
     removeHoverIcons($(this))
 })
 
