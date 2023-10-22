@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "version": "1.9",
+  "name": "Trelloless",
+  "description": "A Lyttle chrome extension for simplifying Trello",
+  "background": { "service_worker": "background.js" },
+  "action": {
+    "default_icon": "icon48.png"
+  },
+  "icons": {
+    "128": "icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://trello.com/*", "https://trello.com/*"],
+      "js": ["lib/jquery-3.0.0.min.js", "content.js"],
+      "css": ["css/layout.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["css/layout.css", "icon128.png", "icon48.png", "star-filled.svg", "star-outline.svg"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "permissions": ["activeTab", "tabs", "storage", "scripting", "declarativeContent"],
+  "host_permissions": ["http://trello.com/*", "https://trello.com/*"]
+}

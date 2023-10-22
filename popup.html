@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    body {
+      margin: 15px;
+      border-radius: 10px;
+      background: #bc4e9c;  /* fallback for old browsers */
+      background: -webkit-linear-gradient(to bottom, #f80759, #bc4e9c);  /* Chrome 10-25, Safari 5.1-6 */
+      background: linear-gradient(to bottom, #f80759, #bc4e9c); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+      padding: 0px 20px;
+      color: white;
+      width: 200px;
+      height: 150px;
+    }
+
+    #title {
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    a {
+      color: white;
+      text-decoration: none;
+      border-bottom: 1px solid #fff;
+    }
+
+    .form-control {
+      font-size: 1rem;
+      display: flex;
+      margin-bottom: 15px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .form-control input {
+      width: 65px;
+      padding: 7px;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div id="title">
+    <h1>Trello Mark</h1>
+  </div>
+
+  <div class="form-control">
+    <label for="list-width">List Width</label>
+    <input type="text" id="list-width">
+  </div>
+
+  <div class="form-control">
+    <label for="list-font">Font Size</label>
+    <input type="text" id="list-font">
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>
