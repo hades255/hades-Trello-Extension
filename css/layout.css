@@ -169,7 +169,7 @@ input.trello-mark-list-menu {
 }
 
 .trello-mark-unshift-card:hover {
-    background-color: var(--ds-background-neutral-hovered,#091e4214);
+    background-color: var(--dds-background-neutral-hovere,#091e4214);
 }
 
 .trello-mark-selector {
@@ -285,6 +285,7 @@ span.list-card-operation.icon-member {
 
 span.list-card-operation.icon-archive {
     left: 4px;
+    content: 'A';
 }
 
 span.list-card-operation {
@@ -292,9 +293,19 @@ span.list-card-operation {
     top: 50%;
     transform: scale(0.8) translate(0px, -15px);
     padding: 2px;
+    z-index: 11;
+    cursor: pointer;
+    visibility: visible;
 }
 
-a.list-card div.charcol-overlay {
+/* a.list-card div.charcol-overlay { */
+li[data-testid="list-card"]{
+    height: 100%;
+    position: relative;
+    padding: 0;
+    margin-bottom: 8px;
+}
+li[data-testid="list-card"] div.charcol-overlay {
     width: 100%;
     height: 100%;
     position: absolute;

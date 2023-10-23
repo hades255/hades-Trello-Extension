@@ -207,7 +207,7 @@ const addUnshiftCard = (lastFlag = false) => {
 
 const addCompleteIcon = (target) => {
     const $completeIcon = jQuery(
-        `<span class="dark-hover icon-check icon-sm js-card-menu list-card-operation"></span>`
+        `<span class="dark-hover icon-check icon-sm js-card-menu list-card-operation">A</span>`
     );
     $completeIcon.on("click", function (ev) {    
         // $titleElem = $(this).closest('a.list-card').find("span.list-card-title")
@@ -230,7 +230,8 @@ const addCompleteIcon = (target) => {
             );            
         });
     });
-    $completeIcon.insertAfter(target.find("span.js-open-quick-card-editor"));
+    // $completeIcon.insertAfter(target.find("span.js-open-quick-card-editor"));
+    $completeIcon.insertAfter(target.find(`div.charcol-overlay`));
 };
 
 const addArchiveIcon = (target) => {
@@ -249,7 +250,8 @@ const addArchiveIcon = (target) => {
             })
         );
     });
-    $archiveIcon.insertBefore(target.find("span.js-open-quick-card-editor"));
+    // $archiveIcon.insertBefore(target.find("span.js-open-quick-card-editor"));
+    $archiveIcon.insertAfter(target.find(`div.charcol-overlay`));
 };
 
 const addClockIcon = (target) => {
@@ -285,14 +287,16 @@ const addClockIcon = (target) => {
             }
         })
     });
-    $clockIcon.insertBefore(target.find("span.js-open-quick-card-editor"));
+    $clockIcon.insertAfter(target.find(`div.charcol-overlay`));
+    // $clockIcon.insertBefore(target.find("span.js-open-quick-card-editor"));
 };
 
 const addViewIcon = (target) => {
     const $viewIcon = jQuery(
         `<span class="dark-hover icon-subscribe icon-sm js-card-menu list-card-operation"></span>`
     );    
-    $viewIcon.insertBefore(target.find("span.js-open-quick-card-editor"));
+    // $viewIcon.insertBefore(target.find("span.js-open-quick-card-editor"));
+    $viewIcon.insertAfter(target.find(`div.charcol-overlay`));
 };
 
 const addPersonIcon = (target) => {
@@ -312,7 +316,8 @@ const addPersonIcon = (target) => {
         markSetting.card[cardId].delegated = !markSetting.card[cardId].delegated;
         updateDelegated()        
     });    
-    $personIcon.insertBefore(target.find("span.js-open-quick-card-editor"));
+    $personIcon.insertAfter(target.find(`div.charcol-overlay`));
+    // $personIcon.insertBefore(target.find("span.js-open-quick-card-editor"));
 };
 
 const addStarIcon = (target) => {
@@ -333,7 +338,8 @@ const addStarIcon = (target) => {
         store("tmSetting", markSetting);
         updateStar()        
     });   
-    $starIcon.insertBefore(target.find("span.js-open-quick-card-editor"));
+    $starIcon.insertAfter(target.find(`div.charcol-overlay`));
+    // $starIcon.insertBefore(target.find("span.js-open-quick-card-editor"));
 };
 
 const addOutcomeText = (target) => {
@@ -343,14 +349,15 @@ const addOutcomeText = (target) => {
     const $outcomeText = jQuery(
         `<div class="badge badge-text outcome-text">${outcomeText}</div>`
     );    
-    $outcomeText.insertAfter(target.find("span.js-open-quick-card-editor"));
+    $outcomeText.insertAfter(target.find(`div.charcol-overlay`));
+    // $outcomeText.insertAfter(target.find("span.js-open-quick-card-editor"));
 };
 
 const addCharcolOverlay = (target) => {
     let $charcolOverlay = jQuery(
         `<div class="charcol-overlay"></div>`
-    );    
-    $charcolOverlay.appendTo(target);
+    );
+    $charcolOverlay.appendTo(target[0]);
 }
 
 const changeWidth = (val) => {
@@ -745,18 +752,17 @@ jQuery(document).bind("mouseup", function (e) {
 });
 
 const addHoverIcons = (target) => {    
+    addCharcolOverlay(target);
     addArchiveIcon(target);
-    // addViewIcon(target);    
+    addViewIcon(target);    
     addCompleteIcon(target);
     addClockIcon(target);
     addOutcomeText(target);
-    addCharcolOverlay(target);
     addPersonIcon(target);
     addStarIcon(target);
 }
 
 const removeHoverIcons = (target) => {    
-    console.log("remove")
     $('[data-testid="list-card"] span.icon-archive').remove()
     $('[data-testid="list-card"] span.icon-check').remove()
     $('[data-testid="list-card"] span.icon-star').remove()
@@ -777,23 +783,37 @@ const updateBoard = () => {
     addUnshiftCard();    
 };
 
-jQuery("title").bind("DOMSubtreeModified", function () {
-    let title = jQuery.trim(jQuery(this).text());
-    if (!window.location.href) return;
-    let path = window.location.href.split("/");
+// 
 
-    if (path[3] != "b") return; // works for boards only, not cards
+function handleTitleChange(mutationsList) {
+    for (const mutation of mutationsList) {
+        if (mutation.type === 'childList' && mutation.target === document.head) {
+            const title = jQuery.trim(jQuery("title").text());
+            if (!window.location.href) return;
+            const path = window.location.href.split("/");
+            if (path[3] !== "b") return; // works for boards only, not cards
 
-    // check if board was changed
-    if (title == page.boardTitle || page.boardId == path[4]) {        
-        updateCompleteLineThrough()
-        return
-    };
-    page.boardTitle = title;
-    page.boardId = path[4];
-    console.log("board changed");
-    setTimeout(updateBoard, 500);
-});
+            // Check if board was changed
+            if (title === page.boardTitle || page.boardId === path[4]) {
+                updateCompleteLineThrough();
+                return;
+            }
+            page.boardTitle = title;
+            page.boardId = path[4];
+            console.log("board changed");
+            setTimeout(updateBoard, 500);
+        }
+    }
+}
+
+// Create a MutationObserver to monitor changes in the head element
+const observer = new MutationObserver(handleTitleChange);
+
+// Start observing changes in the head element
+observer.observe(document.head, { childList: true });
+
+// Initial check for the current board
+handleTitleChange([{ type: 'childList', target: document.head }]);
 
 // jQuery(document).on("DOMSubtreeModified", ".list-card", function (e) {
 //     if (!$(this).prop("href")) return;
