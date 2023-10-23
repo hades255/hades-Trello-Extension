@@ -207,7 +207,7 @@ const addUnshiftCard = (lastFlag = false) => {
 
 const addCompleteIcon = (target) => {
     const $completeIcon = jQuery(
-        `<span class="dark-hover icon-check icon-sm js-card-menu list-card-operation">A</span>`
+        `<span class="dark-hover icon-check icon-sm js-card-menu list-card-operation"></span>`
     );
     $completeIcon.on("click", function (ev) {    
         // $titleElem = $(this).closest('a.list-card').find("span.list-card-title")
@@ -328,12 +328,15 @@ const addStarIcon = (target) => {
         ev.stopImmediatePropagation();
         ev.preventDefault();
         ev.stopPropagation();
-        let path = $(this).closest("a.list-card").prop("href").split("/");
+        // let path = $(this).closest("a.list-card").prop("href").split("/");
+        let path = $(this).closest(`li[data-testid="list-card"]`).find(`a[data-testid="card-name"]`).prop("href").split("/")
+        console.log(path)
         if (!path || path[3] != "c" || !path[4]) return;
+        console.log(path)
         const cardId = path[4];
         if (!markSetting.card) markSetting.card = {};
         if (!markSetting.card[cardId])
-            markSetting.card[cardId] = {};        
+            markSetting.card[cardId] = {};
         markSetting.card[cardId].star = !markSetting.card[cardId].star;
         store("tmSetting", markSetting);
         updateStar()        
@@ -406,9 +409,11 @@ const updateDelegated = () => {
 
 const updateStar = () => {
     $("div.card-star-wrapper").remove()
-    $(".list-card").removeClass("filter-star")
+    // $(".list-card").removeClass("filter-star")
+    $(`li[data-testid="list-card"]`).removeClass("filter-star")
     if (markSetting.card) {
-        document.querySelectorAll(".list-card").forEach((el) => {
+        // document.querySelectorAll(".list-card").forEach((el) => {
+        document.querySelectorAll(`li[data-testid="list-card"]`).forEach((el) => {
             if (!$(el).prop("href")) return;
             let path = $(el).prop("href").split("/");
             if (!path || path[3] != "c" || !path[4]) return;
