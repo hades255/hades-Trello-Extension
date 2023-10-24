@@ -275,12 +275,20 @@ input.trello-mark-list-menu {
     0 0 0 0.2031rem rgba(11, 211, 119, 0.25);
 }
 
-span.js-open-quick-card-editor {
-  left: 138px;
+button[data-testid="quick-card-editor-button"] {
+  visibility: hidden;
+}
+
+span.list-card-operation.icon-edit {
+  left: 134px;
+}
+
+span.list-card-operation.icon-subscribe {
+  left: 134px;
 }
 
 span.list-card-operation.icon-star {
-  left: 110px;
+  left: 108px;
 }
 
 span.list-card-operation.icon-clock {

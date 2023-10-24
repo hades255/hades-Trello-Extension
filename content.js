@@ -208,23 +208,28 @@ const addCompleteIcon = (target) => {
     `<span class="dark-hover icon-check icon-sm js-card-menu list-card-operation"></span>`
   );
   $completeIcon.on("click", function (ev) {
-    // $titleElem = $(this).closest('a.list-card').find("span.list-card-title")
-    // if ($titleElem.hasClass("trello-mark-line-through")) $titleElem.removeClass("trello-mark-line-through")
-    // else $titleElem.addClass("trello-mark-line-through")
+    ev.stopImmediatePropagation();
+    ev.preventDefault();
+    ev.stopPropagation();
+    $titleElem = target.find(`a[data-testid="card-name"]`);
+    if ($titleElem.hasClass("trello-mark-line-through"))
+      $titleElem.removeClass("trello-mark-line-through");
+    else $titleElem.addClass("trello-mark-line-through");
     // changeCompleteByIcon = true
-    waitForElm("div.card-detail-window").then((elm) => {
-      // $('div.editor-sticky-toolbar').css("display", "none")
-      $(
-        "div.custom-field-detail-item h3.card-detail-item-header[title='Complete']+span"
-      )?.click();
-      $("div.editor-sticky-toolbar a.dialog-close-button")[0].dispatchEvent(
-        new MouseEvent("click", {
-          bubbles: true,
-          cancelable: true,
-          view: window,
-        })
-      );
-    });
+
+    // waitForElm("div.card-detail-window").then((elm) => {
+    //   // $('div.editor-sticky-toolbar').css("display", "none")
+    //   $(
+    //     "div.custom-field-detail-item h3.card-detail-item-header[title='Complete']+span"
+    //   )?.click();
+    //   $("div.editor-sticky-toolbar a.dialog-close-button")[0].dispatchEvent(
+    //     new MouseEvent("click", {
+    //       bubbles: true,
+    //       cancelable: true,
+    //       view: window,
+    //     })
+    //   );
+    // });
   });
   // $completeIcon.insertAfter(target.find("span.js-open-quick-card-editor"));
   $completeIcon.insertAfter(target.find(`div.charcol-overlay`));
@@ -259,39 +264,44 @@ const addClockIcon = (target) => {
     ev.preventDefault();
     ev.stopPropagation();
     // let path = $(this).closest("a.list-card").prop("href").split("/");
-    let path = $(this)
-      .closest(`li[data-testid="list-card"]`)
+    let path = target
       .find(`a[data-testid="card-name"]`)
       .prop("href")
       .split("/");
     if (!path || path[3] != "c" || !path[4]) return;
     const cardId = path[4];
-    $(this).closest(".list-card").find(".js-open-quick-card-editor").click();
-    waitForElm(".quick-card-editor-card .list-card-quick-edit").then(() => {
-      $(".quick-card-editor-card .list-card-quick-edit").remove();
-      $(".quick-card-editor-card .js-save-edits").remove();
-      $(".quick-card-editor-card .quick-card-editor-buttons").empty();
+    target.find(`button[data-testid="quick-card-editor-button"]`).click();
+    waitForElm(`button[data-testid="quick-card-editor-archive"]`).then(() => {
+      // $(".quick-card-editor-card .list-card-quick-edit").remove();
+      // $(".quick-card-editor-card .js-save-edits").remove();
+      $(`a[data-testid="quick-card-editor-open-card"]`).hide();
+      $(`button[data-testid="quick-card-editor-edit-labels"]`).hide();
+      $(`button[data-testid="quick-card-editor-move"]`).hide();
+      $(`button[data-testid="quick-card-editor-copy"]`).hide();
+      $(`button[data-testid="quick-card-editor-achive"]`).hide();
+      $(`button[data-testid="quick-card-editor-edit-dates"]`).hide();
+      $(`button[data-testid="quick-card-editor-change-cover"]`).hide();
+      $(`button[data-testid="quick-card-editor-change-members"]`).hide();
+      // $(`div[data-testid="quick-card-editor-buttons"]`).empty();
       let timeArr = [0, 5, 10, 15, 20, 25, 30, 45, 60, 120, 180];
       for (const item of timeArr) {
-        let $timeMenu =
-          jQuery(`<a class="quick-card-editor-buttons-item" href="#">
-                    <span class="quick-card-editor-buttons-item-text">${
+        let $timeMenu = jQuery(`<a class="BppQGb2j7TfyB5" href="#">
+                    <span class="gMwAd04JA9b_bj">${
                       item ? item : "Remove"
                     }</span>
                 </a>`);
         $timeMenu.on(
           "click",
           debounce(() => {
+            console.log(cardId, item)
             if (!markSetting.card) markSetting.card = {};
             if (!markSetting.card[cardId]) markSetting.card[cardId] = {};
             markSetting.card[cardId].timeValue = item;
-            $(".quick-card-editor").remove();
+            // $(".quick-card-editor").remove();
             rebuildDynamicStyles();
           })
         );
-        $(".quick-card-editor-card .quick-card-editor-buttons").append(
-          $timeMenu
-        );
+        $(`div[data-testid="quick-card-editor-buttons"]`).append($timeMenu);
       }
     });
   });
@@ -299,31 +309,44 @@ const addClockIcon = (target) => {
   // $clockIcon.insertBefore(target.find("span.js-open-quick-card-editor"));
 };
 
-const addViewIcon = (target) => {
-  const $viewIcon = jQuery(
-    `<span class="dark-hover icon-subscribe icon-sm js-card-menu list-card-operation"></span>`
+const addEditIcon = (target) => {
+  const $editIcon = jQuery(
+    `<span class="dark-hover icon-edit icon-sm js-card-menu list-card-operation"></span>`
   );
-  $viewIcon.on("click", function (ev) {
+  $editIcon.on("click", function (ev) {
     ev.stopImmediatePropagation();
     ev.preventDefault();
     ev.stopPropagation();
-    console.log(
-      $(this)
-        .closest(`li[data-testid="list-card"]`)
-        .find(`a[data-testid="card-name"]`)
-    );
-    $(this)
-      .closest(`li[data-testid="list-card"]`)
-      .find(`a[data-testid="card-name"]`)[0]
-      .click();
+    target.find(`button[data-testid="quick-card-editor-button"]`).click();
     // let path = $(this).closest("a.list-card").prop("href").split("/");
     // let path = $(this).closest(`li[data-testid="list-card"]`).find(`a[data-testid="card-name"]`).prop("href")
     // window.location.href=path;
     // history.pushState(null, null, path);
   });
-  // $viewIcon.insertBefore(target.find("span.js-open-quick-card-editor"));
-  $viewIcon.insertAfter(target.find(`div.charcol-overlay`));
+  // $editIcon.insertBefore(target.find("span.js-open-quick-card-editor"));
+  $editIcon.insertAfter(target.find(`div.charcol-overlay`));
 };
+
+// const addViewIcon = (target) => {
+//   const $viewIcon = jQuery(
+//     `<span class="dark-hover icon-subscribe icon-sm js-card-menu list-card-operation"></span>`
+//   );
+//   $viewIcon.on("click", function (ev) {
+//     ev.stopImmediatePropagation();
+//     ev.preventDefault();
+//     ev.stopPropagation();
+//     $(this)
+//       .closest(`li[data-testid="list-card"]`)
+//       .find(`a[data-testid="card-name"]`)
+//       .click();
+//     // let path = $(this).closest("a.list-card").prop("href").split("/");
+//     // let path = $(this).closest(`li[data-testid="list-card"]`).find(`a[data-testid="card-name"]`).prop("href")
+//     // window.location.href=path;
+//     // history.pushState(null, null, path);
+//   });
+//   // $viewIcon.insertBefore(target.find("span.js-open-quick-card-editor"));
+//   $viewIcon.insertAfter(target.find(`div.charcol-overlay`));
+// };
 
 const addPersonIcon = (target) => {
   const $personIcon = jQuery(
@@ -334,8 +357,7 @@ const addPersonIcon = (target) => {
     ev.preventDefault();
     ev.stopPropagation();
     // let path = $(this).closest("a.list-card").prop("href").split("/");
-    let path = $(this)
-      .closest(`li[data-testid="list-card"]`)
+    let path = target
       .find(`a[data-testid="card-name"]`)
       .prop("href")
       .split("/");
@@ -359,8 +381,7 @@ const addStarIcon = (target) => {
     ev.preventDefault();
     ev.stopPropagation();
     // let path = $(this).closest("a.list-card").prop("href").split("/");
-    let path = $(this)
-      .closest(`li[data-testid="list-card"]`)
+    let path = target
       .find(`a[data-testid="card-name"]`)
       .prop("href")
       .split("/");
@@ -391,7 +412,10 @@ const addOutcomeText = (target) => {
 
 const addCharcolOverlay = (target) => {
   let $charcolOverlay = jQuery(`<div class="charcol-overlay"></div>`);
-  $charcolOverlay.appendTo(target[0]);
+
+  $charcolOverlay.insertAfter(
+    target.find(`button[data-testid="quick-card-editor-button"]`)
+  );
 };
 
 const changeWidth = (val) => {
@@ -488,15 +512,13 @@ const rebuildDynamicStyles = () => {
   updateDelegated();
   updateCompleteLineThrough();
   const thisTimer = () => {
-    setTimeout(() => {
-      if (
-        document.querySelectorAll(`li[data-testid="list-card"]`).length === 0
-      ) {
+    if (document.querySelectorAll(`li[data-testid="list-card"]`).length === 0) {
+      setTimeout(() => {
         thisTimer();
-      } else {
-        updateStar();
-      }
-    }, 500);
+      }, 500);
+    } else {
+      updateStar();
+    }
   };
   thisTimer();
 
@@ -584,40 +606,53 @@ const rebuildDynamicStyles = () => {
   $(".list-time-wrapper").remove();
   $(".card-time-wrapper").remove();
   $("textarea.mod-list-name").removeClass("with-time-wrapper");
+  console.log(markSetting)
   if (markSetting.card && !markSetting.hideIcon) {
-    document.querySelectorAll(".js-list").forEach((listElem) => {
-      let totalTime = 0;
-      listElem.querySelectorAll(".list-card").forEach((cardElem) => {
-        if (!$(cardElem).prop("href")) return;
-        let path = $(cardElem).prop("href").split("/");
-        if (!path || path[3] != "c" || !path[4]) return;
-        let cardId = path[4];
-        if (
-          markSetting.card &&
-          markSetting.card[cardId] &&
-          markSetting.card[cardId].timeValue
-        ) {
-          totalTime += markSetting.card[cardId].timeValue;
-          const $cardTimeElem = jQuery(
-            `<span class="card-time-wrapper" style="font-size: ${
-              markSetting.font ? markSetting.font : 14
-            }px; line-height: ${
-              markSetting.font ? (markSetting.font * 10) / 7 : 20
-            }px">${markSetting.card[cardId].timeValue}</span>`
+    document
+      .querySelectorAll(`ol[data-testid="list-cards"]`)
+      .forEach((listElem) => {
+        let totalTime = 0;
+        listElem
+          .querySelectorAll(`li[data-testid="list-card"]`)
+          .forEach((cardElem) => {
+            if (!$(cardElem).find(`a[data-testid="card-name"]`).prop("href"))
+              return;
+            let path = $(cardElem)
+              .find(`a[data-testid="card-name"]`)
+              .prop("href")
+              .split("/");
+            if (!path || path[3] != "c" || !path[4]) return;
+            let cardId = path[4];
+            if (
+              markSetting.card &&
+              markSetting.card[cardId] &&
+              markSetting.card[cardId].timeValue
+            ) {
+              totalTime += markSetting.card[cardId].timeValue;
+              const $cardTimeElem = jQuery(
+                `<span class="card-time-wrapper" style="font-size: ${
+                  markSetting.font ? markSetting.font : 14
+                }px; line-height: ${
+                  markSetting.font ? (markSetting.font * 10) / 7 : 20
+                }px">${markSetting.card[cardId].timeValue}</span>`
+              );
+              $(cardElem)
+                .find(`[data-testid="card-name"]`)
+                .prepend($cardTimeElem);
+            }
+          });
+        if (totalTime) {
+          const $listTimeElem = jQuery(
+            `<span class="list-time-wrapper">${totalTime}</span>`
           );
-          $(cardElem).find("span.list-card-title").prepend($cardTimeElem);
+          $listTimeElem.insertBefore(
+            $(listElem).find(`[data-testid="list-name"]`)
+          );
+          $(listElem)
+            .find(`[data-testid="list-name"]`)
+            .addClass("with-time-wrapper");
         }
       });
-      if (totalTime) {
-        const $listTimeElem = jQuery(
-          `<span class="list-time-wrapper">${totalTime}</span>`
-        );
-        $listTimeElem.insertBefore($(listElem).find("textarea.mod-list-name"));
-        $(listElem)
-          .find("textarea.mod-list-name")
-          .addClass("with-time-wrapper");
-      }
-    });
   }
   setTimeout(() => {
     onRebuild = false;
@@ -824,13 +859,14 @@ jQuery(document).bind("mouseup", function (e) {
 
 const addHoverIcons = (target) => {
   addCharcolOverlay(target);
-  addArchiveIcon(target);
-  addViewIcon(target);
-  addCompleteIcon(target);
-  addClockIcon(target);
-  addOutcomeText(target);
-  addPersonIcon(target);
+  addEditIcon(target);
+  // addViewIcon(target);
   addStarIcon(target);
+  addPersonIcon(target);
+  addOutcomeText(target);
+  addClockIcon(target);
+  addCompleteIcon(target);
+  addArchiveIcon(target);
 };
 
 const removeHoverIcons = (target) => {
@@ -838,8 +874,9 @@ const removeHoverIcons = (target) => {
   $('[data-testid="list-card"] span.icon-check').remove();
   $('[data-testid="list-card"] span.icon-star').remove();
   $('[data-testid="list-card"] span.icon-clock').remove();
-  $('[data-testid="list-card"] span.icon-subscribe').remove();
+  // $('[data-testid="list-card"] span.icon-subscribe').remove();
   $('[data-testid="list-card"] span.icon-member').remove();
+  $('[data-testid="list-card"] span.icon-edit').remove();
   $('[data-testid="list-card"] div.outcome-text').remove();
   $('[data-testid="list-card"] div.charcol-overlay').remove();
 };
