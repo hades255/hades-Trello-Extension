@@ -270,40 +270,37 @@ const addClockIcon = (target) => {
       .split("/");
     if (!path || path[3] != "c" || !path[4]) return;
     const cardId = path[4];
-    target.find(`button[data-testid="quick-card-editor-button"]`).click();
-    waitForElm(`button[data-testid="quick-card-editor-archive"]`).then(() => {
-      // $(".quick-card-editor-card .list-card-quick-edit").remove();
-      // $(".quick-card-editor-card .js-save-edits").remove();
-      $(`a[data-testid="quick-card-editor-open-card"]`).hide();
-      $(`button[data-testid="quick-card-editor-edit-labels"]`).hide();
-      $(`button[data-testid="quick-card-editor-move"]`).hide();
-      $(`button[data-testid="quick-card-editor-copy"]`).hide();
-      $(`button[data-testid="quick-card-editor-achive"]`).hide();
-      $(`button[data-testid="quick-card-editor-edit-dates"]`).hide();
-      $(`button[data-testid="quick-card-editor-change-cover"]`).hide();
-      $(`button[data-testid="quick-card-editor-change-members"]`).hide();
-      // $(`div[data-testid="quick-card-editor-buttons"]`).empty();
-      let timeArr = [0, 5, 10, 15, 20, 25, 30, 45, 60, 120, 180];
-      for (const item of timeArr) {
-        let $timeMenu = jQuery(`<a class="BppQGb2j7TfyB5" href="#">
-                    <span class="gMwAd04JA9b_bj">${
+    target.find(`[data-testid="quick-card-editor-button"]`).click();
+    setTimeout(() => {
+      waitForElm(`[data-testid='quick-card-editor-overlay']`).then(() => {
+        $(`[data-testid='quick-card-editor-overlay'] form`).remove();
+        $(`[data-testid="quick-card-editor-buttons"]`).empty();
+        let timeArr = [0, 5, 10, 15, 20, 25, 30, 45, 60, 120, 180];
+        for (const item of timeArr) {
+          let $timeMenu =
+            jQuery(`<a class="quick-card-editor-buttons-item" href="#">
+                    <span class="quick-card-editor-buttons-item-text">${
                       item ? item : "Remove"
                     }</span>
                 </a>`);
-        $timeMenu.on(
-          "click",
-          debounce(() => {
-            console.log(cardId, item)
-            if (!markSetting.card) markSetting.card = {};
-            if (!markSetting.card[cardId]) markSetting.card[cardId] = {};
-            markSetting.card[cardId].timeValue = item;
-            // $(".quick-card-editor").remove();
-            rebuildDynamicStyles();
-          })
-        );
-        $(`div[data-testid="quick-card-editor-buttons"]`).append($timeMenu);
-      }
-    });
+          $timeMenu.on(
+            "click",
+            debounce(() => {
+              if (!markSetting.card) markSetting.card = {};
+              if (!markSetting.card[cardId]) markSetting.card[cardId] = {};
+              markSetting.card[cardId].timeValue = item;
+
+              rebuildDynamicStyles();
+              $(`[data-testid="quick-card-editor-buttons"]`).parent().remove();
+              $(`[data-testid="quick-card-editor-overlay"]`).css({
+                backgroundColor: "rgba(0,0,0,0)",
+              });
+            })
+          );
+          $(`[data-testid="quick-card-editor-buttons"]`).append($timeMenu);
+        }
+      });
+    }, 1);
   });
   $clockIcon.insertAfter(target.find(`div.charcol-overlay`));
   // $clockIcon.insertBefore(target.find("span.js-open-quick-card-editor"));
@@ -447,11 +444,11 @@ const updateCompleteLineThrough = () => {
 };
 
 const updateDelegated = () => {
-  $("span.list-card-title").removeClass("trello-mark-delegated");
+  $(`a[data-testid="card-name"]`).removeClass("trello-mark-delegated");
   if (markSetting.card) {
-    document.querySelectorAll(".list-card").forEach((el) => {
-      if (!$(el).prop("href")) return;
-      let path = $(el).prop("href").split("/");
+    document.querySelectorAll(`li[data-testid="list-card"]`).forEach((el) => {
+      if (!$(el).find(`a[data-testid="card-name"]`).prop("href")) return;
+      let path = $(el).find(`a[data-testid="card-name"]`).prop("href").split("/");
       if (!path || path[3] != "c" || !path[4]) return;
       let cardId = path[4];
       if (
@@ -459,7 +456,7 @@ const updateDelegated = () => {
         markSetting.card[cardId] &&
         markSetting.card[cardId].delegated
       )
-        $(el).find("span.list-card-title").addClass(`trello-mark-delegated`);
+        $(el).find(`a[data-testid="card-name"]`).addClass(`trello-mark-delegated`);
     });
   }
 };
@@ -606,53 +603,41 @@ const rebuildDynamicStyles = () => {
   $(".list-time-wrapper").remove();
   $(".card-time-wrapper").remove();
   $("textarea.mod-list-name").removeClass("with-time-wrapper");
-  console.log(markSetting)
   if (markSetting.card && !markSetting.hideIcon) {
-    document
-      .querySelectorAll(`ol[data-testid="list-cards"]`)
-      .forEach((listElem) => {
-        let totalTime = 0;
-        listElem
-          .querySelectorAll(`li[data-testid="list-card"]`)
-          .forEach((cardElem) => {
-            if (!$(cardElem).find(`a[data-testid="card-name"]`).prop("href"))
-              return;
-            let path = $(cardElem)
-              .find(`a[data-testid="card-name"]`)
-              .prop("href")
-              .split("/");
-            if (!path || path[3] != "c" || !path[4]) return;
-            let cardId = path[4];
-            if (
-              markSetting.card &&
-              markSetting.card[cardId] &&
-              markSetting.card[cardId].timeValue
-            ) {
-              totalTime += markSetting.card[cardId].timeValue;
-              const $cardTimeElem = jQuery(
-                `<span class="card-time-wrapper" style="font-size: ${
-                  markSetting.font ? markSetting.font : 14
-                }px; line-height: ${
-                  markSetting.font ? (markSetting.font * 10) / 7 : 20
-                }px">${markSetting.card[cardId].timeValue}</span>`
-              );
-              $(cardElem)
-                .find(`[data-testid="card-name"]`)
-                .prepend($cardTimeElem);
-            }
-          });
-        if (totalTime) {
-          const $listTimeElem = jQuery(
-            `<span class="list-time-wrapper">${totalTime}</span>`
+    document.querySelectorAll(`[data-testid="list"]`).forEach((listElem) => {
+      let totalTime = 0;
+      listElem.querySelectorAll(`a[data-testid="card-name"]`).forEach((cardElem) => {
+        if (!$(cardElem).prop("href")) return;
+        let path = $(cardElem).prop("href").split("/");
+        if (!path || path[3] != "c" || !path[4]) return;
+        let cardId = path[4];
+        if (
+          markSetting.card &&
+          markSetting.card[cardId] &&
+          markSetting.card[cardId].timeValue
+        ) {
+          totalTime += markSetting.card[cardId].timeValue;
+          const $cardTimeElem = jQuery(
+            `<span class="card-time-wrapper" style="font-size: ${
+              markSetting.font ? markSetting.font : 14
+            }px; line-height: ${
+              markSetting.font ? (markSetting.font * 10) / 7 : 20
+            }px">${markSetting.card[cardId].timeValue}</span>`
           );
-          $listTimeElem.insertBefore(
-            $(listElem).find(`[data-testid="list-name"]`)
-          );
-          $(listElem)
-            .find(`[data-testid="list-name"]`)
-            .addClass("with-time-wrapper");
+          $(cardElem).prepend($cardTimeElem);
         }
       });
+      if (totalTime) {
+        const $listTimeElem = jQuery(
+          `<span class="list-time-wrapper">${totalTime}</span>`
+        );
+        $listTimeElem.insertBefore($(listElem).find(`[data-testid="list-name"]`).parent());
+        $(listElem)
+          .find(`[data-testid="list-name"]`)
+          .addClass("with-time-wrapper");
+          // $(listElem).find(`[data-testid="list-name"]`).css({left:20, display: 'inline'});
+      }
+    });
   }
   setTimeout(() => {
     onRebuild = false;
