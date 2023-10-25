@@ -44,8 +44,7 @@ let renderAttrName = function (name) {
 };
 
 const store = function (key, value) {
-  console.log(key, value);
-  chrome.storage.sync.set({ [key]: value });
+  if (key) chrome.storage.sync.set({ [key]: value });
 };
 
 const loadSavedSetting = () => {
@@ -754,8 +753,7 @@ jQuery(document).bind("mouseup", function (e) {
       //card background menu
       changeBackgroundColorQuickCardEditor(backgroundColor);
       changeFontColorQuickCardEditor(fontColor);
-      let $backgroundColorMenu =
-        jQuery(`<a class="BppQGb2j7TfyB5" href="#">
+      let $backgroundColorMenu = jQuery(`<a class="BppQGb2j7TfyB5" href="#">
             <span class="gMwAd04JA9b_bj icon-sm icon-board"></span>
             <span class="quick-card-editor-buttons-item-text">Background</span>
         </a>`);
@@ -777,8 +775,7 @@ jQuery(document).bind("mouseup", function (e) {
         .insertBefore("#convert-card-role-button-react-root");
 
       //card font menu
-      let $fontColorMenu =
-        jQuery(`<a class="BppQGb2j7TfyB5" href="#">
+      let $fontColorMenu = jQuery(`<a class="BppQGb2j7TfyB5" href="#">
             <span class="gMwAd04JA9b_bj icon-sm icon-edit"></span>
             <span class="quick-card-editor-buttons-item-text">Font Color</span>
         </a>`);
@@ -799,7 +796,9 @@ jQuery(document).bind("mouseup", function (e) {
         .append($cardFontColor)
         .insertBefore("#convert-card-role-button-react-root");
       $(`[data-testid="quick-card-editor-buttons"]`).append($fontColorMenu);
-      $(`[data-testid="quick-card-editor-buttons"]`).append($backgroundColorMenu);
+      $(`[data-testid="quick-card-editor-buttons"]`).append(
+        $backgroundColorMenu
+      );
     }, 100);
   }
 
@@ -974,7 +973,18 @@ jQuery(document).on("mouseenter", "[data-testid='list-card']", function (e) {
 
 jQuery(document).on("mouseleave", "[data-testid='list-card']", function (e) {
   removeHoverIcons($(this));
+  onRebuild = false;
+  rebuildDynamicStyles();
 });
+
+// jQuery(document).on("drop", `[data-drop-target-for-element="true"]`, function (e) {
+//   onRebuild = false;
+//   rebuildDynamicStyles();
+// });
+// jQuery(document).on("drop", `[data-drop-target-for-file="true"]`, function (e) {
+//   onRebuild = false;
+//   rebuildDynamicStyles();
+// });
 
 const addDynamicStyles = () => {
   $dynamicStyles.appendTo(jQuery("body"));
