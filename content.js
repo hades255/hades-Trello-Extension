@@ -44,7 +44,7 @@ let renderAttrName = function (name) {
 };
 
 const store = function (key, value) {
-  if (key) chrome.storage.sync.set({ [key]: value });
+  chrome.storage.sync.set({ [key]: value });
 };
 
 const loadSavedSetting = () => {
@@ -147,8 +147,10 @@ const addFontSelector = () => {
 const addArchiveZone = () => {
   const $archiveZone = jQuery(`<div class="trello-mark-archive">Archive</div>`);
 
+  console.log("c");
   $archiveZone.hover(
     function () {
+      console.log("b");
       // document.querySelector('body').focus()
       $archiveZone.addClass("hover");
       document.querySelector("body").dispatchEvent(
@@ -160,6 +162,7 @@ const addArchiveZone = () => {
       );
     },
     function () {
+      console.log("a");
       $archiveZone.removeClass("hover");
     }
   );
@@ -254,8 +257,10 @@ const addArchiveIcon = (target) => {
     ev.stopImmediatePropagation();
     ev.preventDefault();
     ev.stopPropagation();
-    document.querySelector("body").dispatchEvent(
-      new KeyboardEvent("keydown", {
+    console.log("A")
+    // document.querySelector("body")
+    ev.currentTarget.dispatchEvent(
+      new KeyboardEvent("keypress", {
         bubbles: true,
         cancelable: true,
         key: "c",
